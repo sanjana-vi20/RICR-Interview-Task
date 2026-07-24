@@ -1,52 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import CreateFrom from "../../components/CreateFrom";
+import api from "../../config/API";
+import toast from "react-hot-toast";
+import ShareModal from "../../components/ShareModal";
 
 const TeacherDashboard = () => {
-  // Pure UI Dummy Data (Teacher's Created / Assigned Forms)
-  const [forms, setForms] = useState([
-    {
-      _id: "1",
-      title: "CS-301 Web Development Feedback",
-      description: "Feedback for MERN stack & React module.",
-      approvalStatus: "approved",
-      isActive: true,
-      responsesCount: 24,
-      createdAt: "2026-07-20",
-    },
-    {
-      _id: "2",
-      title: "CS-302 Data Structures Review",
-      description: "Mid-semester performance feedback.",
-      approvalStatus: "pending",
-      isActive: false,
-      responsesCount: 0,
-      createdAt: "2026-07-22",
-    },
-    {
-      _id: "3",
-      title: "CS-303 Software Engineering Feedback",
-      description: "Agile methodologies unit survey.",
-      approvalStatus: "rejected",
-      rejectionReason: "Please add MCQ question types for Agile sprint topics.",
-      isActive: false,
-      responsesCount: 0,
-      createdAt: "2026-07-21",
-    },
-  ]);
-
+  const [forms, setForms] = useState([]);
+  const [loading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedFormId, setIsSelectedFormId] = useState("");
+  const [selectedFormTitle, setIsSelectedFormTitle] = useState("");
+  const [selectedFormToken, setSelectedFormToken] = useState("");
 
-  // Pure UI Actions (State Handlers)
-  const handleToggleActive = (id) => {
-    setForms((prev) =>
-      prev.map((f) => (f._id === id ? { ...f, isActive: !f.isActive } : f)),
-    );
+  // 1. Fetch Forms from Backend
+  const fetchForms = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get("/user/get-forms");
+      console.log(res?.data);
+
+      setForms(res?.data?.data || []);
+    } catch (error) {
+      console.log("Fetch Forms Error:", error);
+      toast.error(error?.response?.data?.message || "Failed to load forms");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeleteForm = (id) => {
-    if (window.confirm("Are you sure you want to delete this form?")) {
+  useEffect(() => {
+    fetchForms();
+  }, []);
+
+  // 2. Toggle Active Handler
+  const handleToggleActive = async (id) => {
+    try {
+      const res = await api.patch(`/user/toggle-form/${id}`);
+      toast.success(res?.data?.message || "Form status updated!");
+      setForms((prev) =>
+        prev.map((f) => (f._id === id ? { ...f, isActive: !f.isActive } : f))
+      );
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Action failed");
+    }
+  };
+
+  // 3. Delete Form Handler
+  const handleDeleteForm = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this form?")) return;
+
+    try {
+      const res = await api.delete(`/user/delete-form/${id}`);
+      toast.success(res?.data?.message || "Form deleted successfully");
       setForms((prev) => prev.filter((f) => f._id !== id));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Delete failed");
     }
   };
 
@@ -124,7 +134,10 @@ const TeacherDashboard = () => {
                 Total Submissions
               </p>
               <p className="text-2xl font-extrabold text-purple-600 mt-1">
-                {forms.reduce((acc, curr) => acc + curr.responsesCount, 0)}
+                {forms.reduce(
+                  (acc, curr) => acc + (curr.responsesCount || 0),
+                  0,
+                )}
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold">
@@ -144,7 +157,11 @@ const TeacherDashboard = () => {
             </span>
           </div>
 
-          {forms.length === 0 ? (
+          {loading ? (
+            <div className="p-12 text-center text-slate-400 text-xs font-medium">
+              Loading forms...
+            </div>
+          ) : forms.length === 0 ? (
             <div className="p-12 text-center text-slate-400 text-xs">
               No forms available. Click "+ Create New Form" to get started.
             </div>
@@ -205,9 +222,13 @@ const TeacherDashboard = () => {
                       )}
 
                     <div className="text-[11px] text-slate-400">
-                      Created: {form.createdAt} •{" "}
+                      Created:{" "}
+                      {form.createdAt
+                        ? new Date(form.createdAt).toLocaleDateString()
+                        : "N/A"}{" "}
+                      •{" "}
                       <span className="font-medium text-slate-600">
-                        {form.responsesCount} Responses
+                        {form.responsesCount || 0} Responses
                       </span>
                     </div>
                   </div>
@@ -217,6 +238,7 @@ const TeacherDashboard = () => {
                     {/* Activation Toggle (Only allowed if approved) */}
                     {form.approvalStatus === "approved" && (
                       <button
+                        type="button"
                         onClick={() => handleToggleActive(form._id)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                           form.isActive
@@ -230,7 +252,13 @@ const TeacherDashboard = () => {
 
                     {/* Share / Copy Link */}
                     <button
-                      onClick={() => handleShareLink(form._id)}
+                      type="button"
+                      onClick={() => {
+                        setShareModalOpen(true);
+                        setIsSelectedFormId(form._id);
+                        setIsSelectedFormTitle(form.title);
+                        setSelectedFormToken(form.formToken)
+                      }}
                       disabled={!form.isActive}
                       className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Share / Copy Link"
@@ -243,7 +271,7 @@ const TeacherDashboard = () => {
                       to={`/forms/${form._id}/responses`}
                       className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-semibold transition-all"
                     >
-                      Responses ({form.responsesCount})
+                      Responses ({form.responsesCount || 0})
                     </Link>
 
                     {/* Edit Action */}
@@ -257,6 +285,7 @@ const TeacherDashboard = () => {
 
                     {/* Delete Action */}
                     <button
+                      type="button"
                       onClick={() => handleDeleteForm(form._id)}
                       className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                       title="Delete Form"
@@ -270,7 +299,25 @@ const TeacherDashboard = () => {
           )}
         </div>
       </div>
-      {isModalOpen && (<CreateFrom onClose={() => setIsModalOpen(false)}/>)}
+
+      {/* Modal Connections */}
+      {isModalOpen && (
+        <CreateFrom
+          onClose={() => {
+            setIsModalOpen(false);
+            fetchForms();
+          }}
+        />
+      )}
+
+      {isShareModalOpen && (
+        <ShareModal
+          onClose={() => setShareModalOpen(false)}
+          formId={selectedFormId}
+          formTitle={selectedFormTitle}
+          formToken={selectedFormToken}
+        />
+      )}
     </div>
   );
 };

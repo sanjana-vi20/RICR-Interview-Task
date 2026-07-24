@@ -43,6 +43,9 @@ const CreateForm = ({ onClose }) => {
       },
     ]);
   };
+  const handleClose = ()=>{
+    onClose();
+  }
 
   const handleRemoveQuestion = (index) => {
     if (questions.length === 1) return;
@@ -112,13 +115,16 @@ const CreateForm = ({ onClose }) => {
     })),
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = api.post("/user/create-form", formData);
+      const res = await api.post("/user/create-form", formData);
+      console.log( "Backend data :", res?.data);
+      
       toast.success(res?.data?.message);
+      handleClose();
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.message);

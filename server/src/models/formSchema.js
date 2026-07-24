@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const questionSchema = new mongoose.Schema({
   questionText: {
     type: String,
@@ -10,19 +9,19 @@ const questionSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      'short',
-      'paragraph',
-      'mcq',
-      'checkbox',
-      'dropdown',
-      'star_rating',
-      'yes_no',
+      "short",
+      "paragraph",
+      "mcq",
+      "checkbox",
+      "dropdown",
+      "star_rating",
+      "yes_no",
     ],
   },
-  options: [{ type: String }], 
+  options: [{ type: String }],
   maxStars: {
     type: Number,
-    default: 10, 
+    default: 10,
   },
   required: {
     type: Boolean,
@@ -30,43 +29,44 @@ const questionSchema = new mongoose.Schema({
   },
 });
 
-const formSchema = mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  questions: [questionSchema],
+const formSchema = mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    questions: [questionSchema],
 
-  allowedBatches: [{ type: String }],
+    allowedBatches: [{ type: String }],
 
-  createdBy: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true, 
+      ref: "User",
+      required: true,
     },
     createdByRole: {
       type: String,
-      enum: ['admin', 'teacher'],
-      default: 'teacher',
+      enum: ["admin", "teacher"],
+      default: "teacher",
     },
 
     approvalStatus: {
       type: String,
-      enum: ['approved', 'pending', 'rejected'],
-      default: 'pending', 
+      enum: ["approved", "pending", "rejected"],
+      default: "pending",
     },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       default: null,
     },
     approvedAt: {
@@ -75,22 +75,26 @@ const formSchema = mongoose.Schema({
     },
     rejectionReason: {
       type: String,
-      default: '',
+      default: "",
     },
-    
+
     isActive: {
       type: Boolean,
       default: false,
     },
     activatedAt: {
       type: Date,
-      default: null, 
+      default: null,
+    },
+    formToken: {
+      type: String,
+      default: () => Math.random().toString(36).substring(2, 10), // e.g. "x8k2p9m1"
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Form = mongoose.model('Form', formSchema);
+const Form = mongoose.model("Form", formSchema);
 export default Form;

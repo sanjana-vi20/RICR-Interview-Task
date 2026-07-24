@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import {Toaster} from "react-hot-toast";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import TeacherDashboard from "./pages/dashboard/TeacherDashboard";
+import FillForm from "./components/FillForm";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-
+          <Route path="/fill-form/:token" element={<FillForm />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",'http://localhost:5174',],
     credentials: true,
   }),
 );
@@ -35,7 +35,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({ message: ErrorMessage });
 });
 
-app.listen(PORT, async () => {
+app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Server is started at port : ${PORT}`);
   connectDB();
 });
