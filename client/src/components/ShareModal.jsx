@@ -5,8 +5,11 @@ import toast from "react-hot-toast";
 
 const ShareModal = ({ onClose, formToken, formId, formTitle }) => {
   // 1. Dynamic Public URL Construct
-  const baseUrl = import.meta.env.VITE_PUBLIC_URL;
-  const cleanBase = baseUrl.replace(/\/+$/, "");;
+  let baseUrl = window.location.origin;
+  if (baseUrl.includes("localhost") && import.meta.env.VITE_PUBLIC_URL) {
+    baseUrl = import.meta.env.VITE_PUBLIC_URL;
+  }
+  const cleanBase = baseUrl.replace(/\/+$/, "");
 
   // Prefer formToken for security, fallback to formId if old record
   const tokenOrId = formToken ;

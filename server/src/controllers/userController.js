@@ -1,5 +1,6 @@
 import Form from "../models/formSchema.js";
 import User from "../models/usermodel.js";
+import Response from "../models/responsemodel.js";
 
 export const UserCreateForm = async (req, res, next) => {
   try {
@@ -75,21 +76,87 @@ export const GetUserForms = async (req, res, next) => {
   }
 };
 
-export const GetFormsForStudent = async(req, res ,next) =>{
+export const GetFormsForStudent = async (req, res, next) => {
   try {
+    const { token } = req.params;
+    const form = await Form.findOne({ formToken: token });
 
-    const {token }= req.params;
-    const form = await Form.find({formToken:token});
-
-    if(!form.isActive)
-    {
-      return res.status(400).json({message:"Form is not Active"});
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
     }
 
-    res.status(200).json({message:"Found" , data : form});
-    
+    if (!form.isActive) {
+      return res.status(400).json({ message: "Form is not Active" });
+    }
+
+    res.status(200).json({ message: "Found", data: form });
   } catch (error) {
     next(error);
-    
   }
-}
+};
+
+export const SubmitResponse = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+    const { studentName, batch, answer } = req.body;
+
+    if (!studentName || !batch || !answer) {
+      return res.status(400).json({ message: "Response not found" });
+    }
+
+    const form = await Form.findOne({ formToken: token });
+    if (!form) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid token or form not found.",
+      });
+    }
+    const normalizedName = studentName.trim();
+    const normalizedBatch = batch.trim();
+
+    
+    const existingResponse = await Response.findOne({
+      form: form._id,
+      studentName: { $regex: new RegExp(`^${normalizedName}$`, "i") },
+      batch: { $regex: new RegExp(`^${normalizedBatch}$`, "i") },
+    });
+
+    if (existingResponse) {
+      // 🔄 RE-FEEDBACK CASE
+      existingResponse.isReFeedback = true;
+      existingResponse.previousAnswers = existingResponse.answers; // Backup old answers
+      existingResponse.answers = answer; // Overwrite with new answers
+      existingResponse.submittedAt = new Date(); // Update submission time
+
+      await existingResponse.save();
+
+      return res.status(200).json({
+        message: "Feedback updated successfully (Re-feedback recorded)!",
+        data: existingResponse,
+      });
+    }
+
+    const newResponse = new Response({
+      form: form._id,
+      studentName: normalizedName,
+      batch: normalizedBatch,
+      answers: answer,
+      isReFeedback: false,
+      previousAnswers: [],
+      submittedAt: new Date(),
+    });
+
+    await newResponse.save();
+
+    return res.status(201).json({
+      message: "Feedback submitted successfully!",
+      data: newResponse,
+    });
+  } catch (error) {
+    console.error("Submit Feedback Error:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};

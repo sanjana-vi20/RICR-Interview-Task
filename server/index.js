@@ -6,12 +6,13 @@ import connectDB from "./src/config/db.js";
 import cookieParser from "cookie-parser";
 import AuthRouter from './src/routers/authRouter.js'
 import UserRouter from './src/routers/userRouter.js'
+import AdminRouter from './src/routers/adminRouter.js'
 
 const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173",'http://localhost:5174',],
+    origin: true,
     credentials: true,
   }),
 );
@@ -21,6 +22,7 @@ app.use(express.json());
 
 app.use("/auth",AuthRouter);
 app.use("/user",UserRouter);
+app.use("/admin" ,AdminRouter);
 
 const PORT = process.env.PORT || 3000;
 
