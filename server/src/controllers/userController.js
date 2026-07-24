@@ -160,3 +160,30 @@ export const SubmitResponse = async (req, res, next) => {
     });
   }
 };
+
+export const ToggleFormActive = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const form = await Form.findById(id);
+
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Optional: add a check to make sure the user is the owner (assignedTo)
+    // if (form.assignedTo.toString() !== req.user._id.toString()) {
+    //   return res.status(403).json({ message: "Unauthorized to toggle this form" });
+    // }
+
+    if (form.approvalStatus !== "approved") {
+      return res.status(400).json({ message: "Cannot activate an unapproved form" });
+    }
+
+    form.isActive = !form.isActive;
+    await form.save();
+
+    res.status(200).json({ message: `Form ${form.isActive ? 'activated' : 'deactivated'} successfully`, data: form });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -9,6 +9,9 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import TeacherDashboard from "./pages/dashboard/TeacherDashboard";
 import FillForm from "./components/FillForm";
 
+import FormResponses from "./pages/FormResponses";
+import EditForm from "./pages/EditForm";
+
 function App() {
   return (
     <>
@@ -16,11 +19,13 @@ function App() {
         <Toaster />
         <Header />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/fill-form/:token" element={<FillForm />} />
+          <Route path="/forms/edit/:id" element={<EditForm />} />
+          <Route path="/forms/:id/responses" element={<FormResponses />} />
         </Routes>
       </BrowserRouter>
     </>
