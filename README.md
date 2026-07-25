@@ -108,14 +108,5 @@ npm run lint         # Run Oxlint code checks
 
 Both services will start on separate ports and communicate via the configured API URL.
 
-## Try asking
-
-- How do I create a new form in the teacher dashboard and generate a shareable QR code?
-- What form field types are supported, and how are responses validated and stored?
-- How do I filter and export form responses, and what analytics are available in the response viewer?
-- Can users with different roles (admin/teacher/respondent) access different features, and how is authorization enforced?
-
----
-
 **Created:** July 2026  
 **Repository:** [sanjana-vi20/RICR-Interview-Task](https://github.com/sanjana-vi20/RICR-Interview-Task)
