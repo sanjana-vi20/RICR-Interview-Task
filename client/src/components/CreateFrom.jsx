@@ -29,7 +29,6 @@ const CreateForm = ({ onClose }) => {
     },
   ]);
 
-  // Handlers for Questions
   const handleAddQuestion = () => {
     setQuestions([
       ...questions,
@@ -57,7 +56,7 @@ const CreateForm = ({ onClose }) => {
     const duplicated = {
       ...qToCopy,
       id: Date.now(),
-      options: [...qToCopy.options], // Deep copy options array
+      options: [...qToCopy.options],
     };
     const updated = [...questions];
     updated.splice(index + 1, 0, duplicated);
@@ -69,8 +68,7 @@ const CreateForm = ({ onClose }) => {
     updated[index][field] = value;
     setQuestions(updated);
   };
-
-  // Handlers for Options inside a specific question
+  
   const handleAddOption = (qIndex) => {
     const updated = [...questions];
     updated[qIndex].options.push(

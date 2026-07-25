@@ -270,6 +270,13 @@ const AdminDashboard = () => {
                       </p>
                       <p className="text-[10px] text-slate-400">Pending</p>
                     </div>
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <div className="text-center px-2">
+                      <p className="text-xs font-extrabold text-indigo-600">
+                        {currentTeacherForms.reduce((acc, f) => acc + (f.responsesCount || 0), 0)}
+                      </p>
+                      <p className="text-[10px] text-slate-400">Responses</p>
+                    </div>
                   </div>
                 </div>
 
@@ -346,15 +353,13 @@ const AdminDashboard = () => {
                             </button>
                           )}
 
-                          {form.approvalStatus === "approved" && (
-                            <Link
-                              to={`/forms/${form._id}/responses`}
-                              className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 hover:border-emerald-500 hover:text-emerald-700 px-3.5 py-2 rounded-xl text-xs font-bold transition-all"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              View Responses ({form.responsesCount || 0})
-                            </Link>
-                          )}
+                          <Link
+                            to={`/view-response/${form._id}`}
+                            className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-indigo-600 hover:bg-indigo-100 px-3.5 py-2 rounded-xl text-xs font-bold transition-all"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            View Responses ({form.responsesCount || 0})
+                          </Link>
 
                           <Link
                             to={`/forms/edit/${form._id}`}

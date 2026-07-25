@@ -19,12 +19,8 @@ export const GetAllTeachers = async (req, res, next) => {
 export const GetTeacherForms = async (req, res, next) => {
   try {
     const { teacherId } = req.params;
-    // Find forms assigned to this teacher
     const forms = await Form.find({ assignedTo: teacherId }).sort({ createdAt: -1 });
-    
-    // We also want to include response counts if possible, but for now just send forms.
-    // The frontend teacher dashboard expects `responsesCount` for some parts, we can aggregate if needed.
-    // Let's manually get counts:
+
     const formsWithCounts = await Promise.all(
       forms.map(async (form) => {
         const count = await Response.countDocuments({ form: form._id });
@@ -47,7 +43,7 @@ export const ApproveForm = async (req, res, next) => {
         approvalStatus: "approved",
         approvedBy: req.user._id,
         approvedAt: new Date(),
-        isActive: true, // Make it active immediately upon approval as a default
+        isActive: true, 
       },
       { new: true }
     );
@@ -69,9 +65,7 @@ export const DeleteForm = async (req, res, next) => {
     if (!deleted) {
       return res.status(404).json({ message: "Form not found" });
     }
-    // Also delete all responses associated with this form
     await Response.deleteMany({ form: id });
-
     res.status(200).json({ message: "Form deleted successfully" });
   } catch (error) {
     next(error);

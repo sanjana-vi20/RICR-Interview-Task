@@ -27,7 +27,7 @@ function App() {
           <Route path="/fill-form/:token" element={<FillForm />} />
           <Route path="/forms/edit/:id" element={<EditForm />} />
           <Route path="/forms/:id/responses" element={<FormResponses />} />
-          <Route path="/view-response" element={<ViewResponses />} />
+          <Route path="/view-response/:id" element={<ViewResponses />} />
 
         </Routes>
       </BrowserRouter>

@@ -24,7 +24,7 @@ export const UserCreateForm = async (req, res, next) => {
       const isOptionBased = ["mcq", "checkbox", "dropdown"].includes(q.type);
       return {
         questionText: q.questionText,
-        type: q.type || "short",
+        type: q.type,
         required: q.required ?? true,
         options: isOptionBased && Array.isArray(q.options) ? q.options : [],
         maxStars: q.type === "star_rating" ? Number(q.maxStars) || 10 : 10,
@@ -42,7 +42,7 @@ export const UserCreateForm = async (req, res, next) => {
       allowedBatches: Array.isArray(allowedBatches) ? allowedBatches : [],
       questions: sanitizedQuestions,
       createdBy: req.user._id,
-      assignedTo: req.user._id, // Default assigned to self
+      assignedTo: req.user._id,
       createdByRole: userRole,
       approvalStatus: isApproved ? "approved" : "pending",
       approvedBy: isApproved ? req.user._id : null,
@@ -67,9 +67,16 @@ export const GetUserForms = async (req, res, next) => {
     });
     console.log(forms);
 
+    const formsWithCounts = await Promise.all(
+      forms.map(async (form) => {
+        const count = await Response.countDocuments({ form: form._id });
+        return { ...form.toObject(), responsesCount: count };
+      })
+    );
+
     res.status(200).json({
       message: "fetched successfully",
-      data: forms,
+      data: formsWithCounts,
     });
   } catch (error) {
     next(error);
@@ -108,13 +115,12 @@ export const SubmitResponse = async (req, res, next) => {
     if (!form) {
       return res.status(404).json({
         success: false,
-        message: "Invalid token or form not found.",
+        message: "form not found.",
       });
     }
     const normalizedName = studentName.trim();
     const normalizedBatch = batch.trim();
 
-    
     const existingResponse = await Response.findOne({
       form: form._id,
       studentName: { $regex: new RegExp(`^${normalizedName}$`, "i") },
@@ -122,16 +128,15 @@ export const SubmitResponse = async (req, res, next) => {
     });
 
     if (existingResponse) {
-      // 🔄 RE-FEEDBACK CASE
       existingResponse.isReFeedback = true;
-      existingResponse.previousAnswers = existingResponse.answers; // Backup old answers
-      existingResponse.answers = answer; // Overwrite with new answers
-      existingResponse.submittedAt = new Date(); // Update submission time
+      existingResponse.previousAnswers = existingResponse.answers; 
+      existingResponse.answers = answer; 
+      existingResponse.submittedAt = new Date();
 
       await existingResponse.save();
 
       return res.status(200).json({
-        message: "Feedback updated successfully (Re-feedback recorded)!",
+        message: "Feedback updated successfully",
         data: existingResponse,
       });
     }
@@ -153,7 +158,7 @@ export const SubmitResponse = async (req, res, next) => {
       data: newResponse,
     });
   } catch (error) {
-    console.error("Submit Feedback Error:", error);
+    console.error( error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,
@@ -170,19 +175,31 @@ export const ToggleFormActive = async (req, res, next) => {
       return res.status(404).json({ message: "Form not found" });
     }
 
-    // Optional: add a check to make sure the user is the owner (assignedTo)
-    // if (form.assignedTo.toString() !== req.user._id.toString()) {
-    //   return res.status(403).json({ message: "Unauthorized to toggle this form" });
-    // }
-
     if (form.approvalStatus !== "approved") {
-      return res.status(400).json({ message: "Cannot activate an unapproved form" });
+      return res
+        .status(400)
+        .json({ message: "Cannot activate" });
     }
-
-    form.isActive = !form.isActive;
     await form.save();
 
-    res.status(200).json({ message: `Form ${form.isActive ? 'activated' : 'deactivated'} successfully`, data: form });
+    res
+      .status(200)
+      .json({
+        message: `Form ${form.isActive ? "activated" : "deactivated"} successfully`,
+        data: form,
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const FetchResponse = async (req, res, next) => {
+  try {
+    const { formId } = req.params;
+    console.log(formId);
+    const responses = await Response.find({ form: formId });
+    console.log("responses : ", responses);
+    res.status(200).json({ message: "fetched", data: responses });
   } catch (error) {
     next(error);
   }

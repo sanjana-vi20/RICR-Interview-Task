@@ -48,7 +48,7 @@ const FormResponses = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Header */}
-        <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate(-1)}
@@ -66,9 +66,17 @@ const FormResponses = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl text-indigo-700 font-semibold border border-indigo-100">
-            <Users className="w-4 h-4" />
-            <span>{responses.length} Submissions</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl text-indigo-700 font-semibold border border-indigo-100">
+              <Users className="w-4 h-4" />
+              <span>{responses.length} Submissions</span>
+            </div>
+            <button
+              onClick={() => navigate(`/forms/${id}/summary`)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
+            >
+              View Summary
+            </button>
           </div>
         </div>
 

@@ -88,7 +88,7 @@ const formSchema = mongoose.Schema(
     },
     formToken: {
       type: String,
-      default: () => Math.random().toString(36).substring(2, 10), // e.g. "x8k2p9m1"
+      default: () => Math.random().toString(36).substring(2, 10),
     },
   },
   {

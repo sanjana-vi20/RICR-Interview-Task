@@ -1,5 +1,5 @@
 import express from "express"
-import { GetFormsForStudent, GetUserForms, SubmitResponse, UserCreateForm, ToggleFormActive } from "../controllers/userController.js";
+import { GetFormsForStudent, GetUserForms, SubmitResponse, UserCreateForm, ToggleFormActive, FetchResponse } from "../controllers/userController.js";
 import { DeleteForm, GetFormDetails, UpdateForm, GetFormResponses } from "../controllers/adminController.js";
 import { Protect } from "../middleware/authMiddleware.js";
 
@@ -14,5 +14,6 @@ router.delete("/delete-form/:id", Protect, DeleteForm);
 router.get("/form/:id", Protect, GetFormDetails);
 router.put("/form/:id", Protect, UpdateForm);
 router.get("/form/:id/responses", Protect, GetFormResponses);
+router.get("/fetch-response/:formId" , Protect , FetchResponse);
 
 export default router;
