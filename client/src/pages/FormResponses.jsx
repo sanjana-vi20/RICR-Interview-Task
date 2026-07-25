@@ -21,7 +21,6 @@ const FormResponses = () => {
       const user = JSON.parse(sessionStorage.getItem("User") || "{}");
       const endpointBase = user.role === "admin" ? `/admin` : `/user`;
 
-      // Dynamic API for fetching responses
       const resResponses = await api.get(`${endpointBase}/form/${id}/responses`);
       setResponses(resResponses?.data?.data || []);
 

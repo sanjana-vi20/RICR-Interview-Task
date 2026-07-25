@@ -1,33 +1,34 @@
 import React, { useRef } from "react";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 
 const ShareModal = ({ onClose, formToken, formId, formTitle }) => {
-  // 1. Dynamic Public URL Construct
+
   let baseUrl = window.location.origin;
   if (baseUrl.includes("localhost") && import.meta.env.VITE_PUBLIC_URL) {
     baseUrl = import.meta.env.VITE_PUBLIC_URL;
   }
   const cleanBase = baseUrl.replace(/\/+$/, "");
 
-  // Prefer formToken for security, fallback to formId if old record
   const tokenOrId = formToken ;
   const formUrl = `${cleanBase}/fill-form/${tokenOrId}`;
 
   const qrRef = useRef(null);
 
-  // 2. Copy Link Handler
   const handleCopy = () => {
     navigator.clipboard.writeText(formUrl);
     toast.success("Link copied to clipboard!");
   };
 
-  // 3. Download QR Handler
-  const handleDownloadQR = async () => {
-    if (!qrRef.current) return;
+  const handleDownloadQR = () => {
     try {
-      const canvas = await html2canvas(qrRef.current);
+      const canvas = qrRef.current?.querySelector("canvas");
+      if (!canvas) {
+        toast.error("QR Code canvas not found!");
+        return;
+      }
+
       const image = canvas.toDataURL("image/png");
 
       const link = document.createElement("a");
@@ -36,6 +37,7 @@ const ShareModal = ({ onClose, formToken, formId, formTitle }) => {
       link.click();
       toast.success("QR Code image downloaded!");
     } catch (err) {
+      console.error("QR Download Error:", err);
       toast.error("Failed to download QR code");
     }
   };
@@ -68,7 +70,7 @@ const ShareModal = ({ onClose, formToken, formId, formTitle }) => {
             ref={qrRef}
             className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"
           >
-            <QRCodeSVG
+            <QRCodeCanvas
               value={formUrl}
               size={180}
               level="M"

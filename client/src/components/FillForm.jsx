@@ -5,7 +5,7 @@ import { FIXED_QUESTIONS } from "../constants/fixedQuestion";
 import RatingInput from "../components/RatingInput";
 import toast from "react-hot-toast";
 
-const RATING_THRESHOLD = 8; // If rating < 8, show reason field
+const RATING_THRESHOLD = 8; 
 
 const FillForm = () => {
   const { token } = useParams();
@@ -22,7 +22,6 @@ const FillForm = () => {
       .catch((err) => console.error("Form error:", err));
   }, [token]);
 
-  // General handler to update answer state
   const handleAnswerChange = (questionId, value) => {
     setAnswers((prev) => ({
       ...prev,
@@ -30,7 +29,6 @@ const FillForm = () => {
     }));
   };
 
-  // Helper component to render dynamic questions based on type
   const renderQuestionInput = (question) => {
     const qId = question._id || question.id;
     const currentVal = answers[qId] || "";
@@ -103,12 +101,10 @@ const FillForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Validation: Name & Batch
     if (!studentName.trim() || !batch.trim()) {
       return toast.error("Please enter your Name and Batch!");
     }
 
-    // 2. Validation: Fixed Questions Mandatory Rating & Reason Check
     for (let i = 0; i < FIXED_QUESTIONS.length; i++) {
       const q = FIXED_QUESTIONS[i];
       const ratingVal = Number(answers[q.id] || 0);
@@ -128,7 +124,6 @@ const FillForm = () => {
     setSubmitting(true);
 
     try {
-      // A) Fixed Questions Format with Reason (if rating < 8)
       const formattedFixedAnswers = FIXED_QUESTIONS.map((q) => {
         const ratingVal = Number(answers[q.id] || 0);
         const reasonVal = answers[`${q.id}_reason`] || "";
@@ -141,24 +136,21 @@ const FillForm = () => {
         };
       });
 
-      // B) Dynamic Questions Format
       const formattedDynamicAnswers = (formData.questions || []).map((q) => ({
         questionId: q._id || q.id,
         questionText: q.questionText,
         answer: answers[q._id || q.id] || "",
       }));
 
-      // C) Merge Answers Array
       const finalAnswersArray = [
         ...formattedFixedAnswers,
         ...formattedDynamicAnswers,
       ];
 
-      // Payload matching Schema
       const payload = {
         studentName: studentName.trim(),
         batch: batch.trim(),
-        answers: finalAnswersArray, // Fixed 'answer' -> 'answers' key
+        answers: finalAnswersArray,
       };
 
       console.log("Submitting Payload:", payload);
@@ -166,13 +158,12 @@ const FillForm = () => {
       
       toast.success("Feedback submitted successfully!");
       
-      // Reset form states
       setStudentName("");
       setBatch("");
       setAnswers({});
 
     } catch (err) {
-      toast.error(err.response?.data?.message || "Submission failed!");
+      toast.error(err.response?.data?.message);
     } finally {
       setSubmitting(false);
     }

@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import api from "../config/API";
 
-// Pie chart colors
 const PIE_COLORS = ["#22c55e", "#ef4444", "#3b82f6", "#f59e0b"];
 
 const ViewResponses = () => {
@@ -32,9 +31,8 @@ const ViewResponses = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("summary");
   const [responses, setResponses] = useState([]);
-  const [expandedPrevious, setExpandedPrevious] = useState({}); // Track expanded re-feedback items
+  const [expandedPrevious, setExpandedPrevious] = useState({}); 
 
-  // 1. Fetch Real Response Data from API
   const fetchResponse = async () => {
     setLoading(true);
     try {
@@ -55,7 +53,6 @@ const ViewResponses = () => {
     }
   }, [formId]);
 
-  // 2. Questions Extraction & Filtering
   const allQuestions = useMemo(() => {
     if (!responses.length) return [];
 
@@ -71,7 +68,6 @@ const ViewResponses = () => {
     });
   }, [responses]);
 
-  // Serial-wise: Pehle User Created Questions, End me Fixed (F1-F5)
   const dynamicQuestions = useMemo(() => {
     return allQuestions.filter((q) => !q.isFixed);
   }, [allQuestions]);
@@ -80,7 +76,6 @@ const ViewResponses = () => {
     return allQuestions.filter((q) => q.isFixed);
   }, [allQuestions]);
 
-  // 3. Overall Fixed Questions (F1 - F5) Bar Chart Data
   const fixedQuestionsBarData = useMemo(() => {
     return fixedQuestions.map((q) => {
       let sum = 0;
@@ -100,7 +95,7 @@ const ViewResponses = () => {
     });
   }, [fixedQuestions, responses]);
 
-  // 4. Helper for Single Question Card
+  
   const getQuestionAnalytics = (qId) => {
     const allAns = responses
       .map((r) => (r.answers || []).find((a) => a.questionId === qId)?.answer)
@@ -142,7 +137,6 @@ const ViewResponses = () => {
     };
   };
 
-  // 5. Negative Responses Filter Logic (< 8 score OR has reason OR "NO" on key questions)
   const negativeResponsesList = useMemo(() => {
     return responses.filter((resp) =>
       (resp.answers || []).some((ans) => {

@@ -8,7 +8,6 @@ const Header = () => {
 
   const { user, setUser, isLogin, setIsLogin, setRole } = useAuth();
 
-  // 2. Direct Logout Handler
   const handleLogout = () => {
     sessionStorage.removeItem("User");
     setUser(null);
