@@ -268,7 +268,7 @@ const TeacherDashboard = () => {
 
                     {/* Responses Link */}
                     <Link
-                      to={`/forms/${form._id}/responses`}
+                      to={`/view-response`}
                       className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-semibold transition-all"
                     >
                       Responses ({form.responsesCount || 0})

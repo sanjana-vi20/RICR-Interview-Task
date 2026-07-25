@@ -11,6 +11,7 @@ import FillForm from "./components/FillForm";
 
 import FormResponses from "./pages/FormResponses";
 import EditForm from "./pages/EditForm";
+import ViewResponses from "./components/ViewResponse";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
           <Route path="/fill-form/:token" element={<FillForm />} />
           <Route path="/forms/edit/:id" element={<EditForm />} />
           <Route path="/forms/:id/responses" element={<FormResponses />} />
+          <Route path="/view-response" element={<ViewResponses />} />
+
         </Routes>
       </BrowserRouter>
     </>
