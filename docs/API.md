@@ -6,8 +6,39 @@ Complete API reference for the Form Builder & Response Management System.
 
 ---
 
+## Quick Summary
+
+**System Overview:**
+- **Purpose:** Form Builder & Response Management System for educational feedback collection
+- **Authentication:** JWT-based with HTTP-only cookies
+- **User Roles:** Student, Teacher, Admin
+- **Core Features:** Create forms, collect responses, view analytics, manage users (admin)
+
+**Key Endpoints:**
+| Feature | Endpoint | Method | Auth Required |
+|---------|----------|--------|---------------|
+| Login | `/auth/login` | POST | No |
+| Create Form | `/user/create-form` | POST | Yes |
+| Get Forms | `/user/get-forms` | GET | Yes |
+| Fill Form | `/user/fill-form/:token` | GET | No |
+| Submit Response | `/user/submit-feedback/:token` | POST | No |
+| Get Responses | `/user/form/:id/responses` | GET | Yes |
+| Get Teachers (Admin) | `/admin/get-teachers` | GET | Yes (Admin) |
+| Approve Form (Admin) | `/admin/form/:id/approve` | PUT | Yes (Admin) |
+
+**Common Workflow:**
+1. User logs in → receives JWT token
+2. Teacher creates form with fields
+3. Form receives share token & QR code
+4. Students fill form using token (no auth needed)
+5. Teacher views responses & analytics
+6. Admin can approve/manage all forms
+
+---
+
 ## Table of Contents
 
+- [Quick Summary](#quick-summary)
 - [Authentication](#authentication)
 - [Auth Endpoints](#auth-endpoints)
 - [User Endpoints](#user-endpoints)
