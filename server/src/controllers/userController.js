@@ -71,7 +71,7 @@ export const GetUserForms = async (req, res, next) => {
       forms.map(async (form) => {
         const count = await Response.countDocuments({ form: form._id });
         return { ...form.toObject(), responsesCount: count };
-      })
+      }),
     );
 
     res.status(200).json({
@@ -129,8 +129,8 @@ export const SubmitResponse = async (req, res, next) => {
 
     if (existingResponse) {
       existingResponse.isReFeedback = true;
-      existingResponse.previousAnswers = existingResponse.answers; 
-      existingResponse.answers = answer; 
+      existingResponse.previousAnswers = existingResponse.answers;
+      existingResponse.answers = answer;
       existingResponse.submittedAt = new Date();
 
       await existingResponse.save();
@@ -158,7 +158,7 @@ export const SubmitResponse = async (req, res, next) => {
       data: newResponse,
     });
   } catch (error) {
-    console.error( error);
+    console.error(error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,
@@ -176,18 +176,23 @@ export const ToggleFormActive = async (req, res, next) => {
     }
 
     if (form.approvalStatus !== "approved") {
-      return res
-        .status(400)
-        .json({ message: "Cannot activate" });
+      return res.status(400).json({ message: "Cannot activate" });
     }
     await form.save();
 
-    res
-      .status(200)
-      .json({
-        message: `Form ${form.isActive ? "activated" : "deactivated"} successfully`,
-        data: form,
-      });
+    if (form.isActive) {
+      setTimeout(
+        async () => {
+          await Form.findByIdAndUpdate(id, { isActive: false });
+          console.log(`⏰ Form ${id} auto-deactivated after 15 minutes.`);
+        },
+        1 * 60 * 1000,
+      );
+    }
+    res.status(200).json({
+      message: `Form ${form.isActive ? "activated" : "deactivated"} successfully`,
+      data: form,
+    });
   } catch (error) {
     next(error);
   }

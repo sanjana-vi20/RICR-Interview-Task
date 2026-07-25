@@ -12,6 +12,7 @@ import FillForm from "./components/FillForm";
 import FormResponses from "./pages/FormResponses";
 import EditForm from "./pages/EditForm";
 import ViewResponses from "./components/ViewResponse";
+import ManageTeachers from "./pages/ManageTeachers";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/forms/edit/:id" element={<EditForm />} />
           <Route path="/forms/:id/responses" element={<FormResponses />} />
           <Route path="/view-response/:id" element={<ViewResponses />} />
+          <Route path="/admin-teachers" element={<ManageTeachers />} />
 
         </Routes>
       </BrowserRouter>

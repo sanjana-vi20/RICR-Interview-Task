@@ -8,6 +8,10 @@ const Header = () => {
 
   const { user, setUser, isLogin, setIsLogin, setRole } = useAuth();
 
+  if (location.pathname.startsWith("/fill-form")) {
+    return null;
+  }
+
   const handleLogout = () => {
     sessionStorage.removeItem("User");
     setUser(null);
@@ -77,7 +81,7 @@ const Header = () => {
                 {/* Admin Only Link */}
                 {user.role === "admin" && (
                   <Link
-                    to="/admin/teachers"
+                    to="/admin-teachers"
                     className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                       isActive("/admin/teachers")
                         ? "bg-indigo-50 text-indigo-600 font-bold"
