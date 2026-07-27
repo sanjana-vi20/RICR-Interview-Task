@@ -105,9 +105,11 @@ export const GetFormsForStudent = async (req, res, next) => {
 export const SubmitResponse = async (req, res, next) => {
   try {
     const { token } = req.params;
-    const { studentName, batch, answer } = req.body;
+    const { studentName, batch, answers } = req.body;
+    console.log(studentName , batch , answers);
+    
 
-    if (!studentName || !batch || !answer) {
+    if (!studentName || !batch || !answers) {
       return res.status(400).json({ message: "Response not found" });
     }
 
@@ -130,7 +132,7 @@ export const SubmitResponse = async (req, res, next) => {
     if (existingResponse) {
       existingResponse.isReFeedback = true;
       existingResponse.previousAnswers = existingResponse.answers;
-      existingResponse.answers = answer;
+      existingResponse.answers = answers;
       existingResponse.submittedAt = new Date();
 
       await existingResponse.save();
@@ -145,7 +147,7 @@ export const SubmitResponse = async (req, res, next) => {
       form: form._id,
       studentName: normalizedName,
       batch: normalizedBatch,
-      answers: answer,
+      answers: answers,
       isReFeedback: false,
       previousAnswers: [],
       submittedAt: new Date(),
